@@ -79,11 +79,11 @@ def check(opts: LlmTutorOptions):
 
             # student Solution
             debug(f'opts.sourceDir = {opts.sourceDir}')
-            # nestedSourceDir = findSolutionDir(opts.sourceDir)
+            nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, "src")))
 
             if assignemnt.src is None:
                 configError(f'No source file defined for assignment {assignemnt.id}')
-            student_pfad = pjoin(opts.sourceDir, assignemnt.src)
+            student_pfad = pjoin(nestedSourceDir, assignemnt.src)
 
             #api 
             api = parseConfig(pjoin(opts.configApi, 'config.yaml'))
