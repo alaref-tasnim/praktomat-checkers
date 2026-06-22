@@ -50,7 +50,7 @@ RUN rm -rf /wypp/.git
 # llm-tutor
 RUN mkdir /llm-tutor
 ADD ./git-clone /git-clone
-RUN bash /git-clone https://github.com/alaref-tasnim/LLM-Tutor.git 432f5fd7bc52bda98709f2e2cbc755946a8febd4 /llm-tutor
+RUN bash /git-clone https://github.com/alaref-tasnim/LLM-Tutor.git 9950dd6a5d6232c01d82e8f4d0cc2bf9eb2265b6 /llm-tutor
 RUN rm -rf /llm-tutor/.git
 
 # Install packages for llm-tutor .toml datei
