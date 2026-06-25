@@ -15,8 +15,8 @@ def configError(s) -> NoReturn:
 @dataclass
 class LlmTutorOptions(Options):
     llm_tutor_dir: str
-    solution_dir: str
-    pdf_dir: str
+    solution_dir: Optional[str]
+    pdf_dir: Optional[str]
     fakeLlm: bool
     configApi: str
     sheet: Optional[str]
@@ -54,7 +54,7 @@ def check(opts: LlmTutorOptions):
         print('Uploading the solution to an LLM was not permitted. Aborting.')
         return
 
-    # test dir, pfad zum exercise.yaml (mount a dir tests/llm-tutor > externel)
+    # Direction with the exercise.yaml file
     exTest_dir = getSheetDir(opts.testDir, opts.sheet)
     exYaml = pjoin(exTest_dir, 'exercise.yaml')
     if isFile(exYaml):
@@ -63,35 +63,41 @@ def check(opts: LlmTutorOptions):
         ex = None
 
     if ex is not None:
-        for assignemnt in ex.assignments:
+        for assignment in ex.assignments:
              
-            # pfad zu Musterlösung (mount a dir > tests/llm-tutor/sampleSolution > solution)
-            if assignemnt.sampleSolution is None:
-                configError(f'No test file defined for assignment {assignemnt.id}')
+            # pfad zu Musterlösung 
+            if assignment.sampleSolution is None:
+                configError(f'No test file defined for assignment {assignment.id}')
+            # Default solution dir is /solution, but can be overridden by --solution-dir
+            if opts.solution_dir:
+                exSampleSolution_pfad = pjoin(opts.solution_dir, assignment.sampleSolution)
+            else:
+                exSampleSolution_pfad = pjoin(exTest_dir, 'solution', assignment.sampleSolution)
 
-            exSampleSolution_pfad = pjoin(getSolutionDir(opts.solution_dir), assignemnt.sampleSolution)
 
+            if assignment.pdf is None:
+                configError(f'No extra file defined for assignment {assignment.id}')
+            # Default pdf dir is /pdf, but can be overridden by --pdf-dir
+            if opts.pdf_dir:
+                pdf = pjoin(opts.pdf_dir, assignment.pdf)
+            else:
+                pdf = pjoin(exTest_dir, 'pdf', assignment.pdf)
 
-            # aufgabe pfad extrahieren
-            if assignemnt.pdf is None:
-                configError(f'No extra file defined for assignment {assignemnt.id}')
-            pdf = pjoin(getPdfDir(opts.pdf_dir), assignemnt.pdf)
 
             # student Solution
             debug(f'opts.sourceDir = {opts.sourceDir}')
             nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, "src")))
+            if assignment.src is None:
+                configError(f'No source file defined for assignment {assignment.id}')
+            student_pfad = pjoin(nestedSourceDir, assignment.src)
 
-            if assignemnt.src is None:
-                configError(f'No source file defined for assignment {assignemnt.id}')
-            student_pfad = pjoin(nestedSourceDir, assignemnt.src)
-
-            #api 
+            # Config for API
             api = parseConfig(pjoin(opts.configApi, 'config.yaml'))
 
             # Result von Sprachmodell
             runLlmTutor(llmTutorPfad=opts.llm_tutor_dir,
                             fake_llm= opts.fakeLlm, 
-                            id= assignemnt.id,
+                            id= assignment.id,
                             sampleSolution= exSampleSolution_pfad, 
                             studentSolution= student_pfad,
                             pdf_task= pdf, 
