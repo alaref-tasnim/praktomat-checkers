@@ -97,7 +97,7 @@ def findSolutionDirAux(root: str, stopCondition: Optional[Callable], isSolutionR
 
 def isNotAWrapperDir(directory: str, isSolutionRoot: bool) -> bool:
     pathnames = ls(directory, '[!.]*')
-    if len(pathnames) == 2 and isSolutionRoot:
+    if isSolutionRoot:
         # Filter out the script that starts the multi checker
         pathnames = list(filter(lambda x: not (basename(x).startswith('check') and x.endswith('.sh')), pathnames))
     if len(pathnames) > 1:
