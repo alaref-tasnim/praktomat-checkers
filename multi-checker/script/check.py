@@ -81,7 +81,7 @@ def candsFromTitle(origTitle: str) -> list[str]:
     return cands
 
 _numRe = re.compile(r'\b\d+\b')
-def getSheetFromEnv(testDir: str) -> Optional[str]:
+def getSheetFromEnv(testDir: Optional[str]) -> Optional[str]:
     task_id = os.environ.get('TASK_ID_CUSTOM')
     if task_id is not None and task_id != '':
         return task_id
