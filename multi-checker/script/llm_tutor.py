@@ -83,15 +83,26 @@ def check(opts: LlmTutorOptions):
             else:
                 pdf = pjoin(exTest_dir, 'pdf', assignment.pdf)
 
+            # aufgabe pfad extrahieren
+            if assignment.pdf is None:
+                configError(f'No extra file defined for assignment {assignment.id}')
+            if opts.pdf_dir:
+                pdf = pjoin(opts.pdf_dir, assignment.pdf)
+            else:
+                pdf = pjoin(exTest_dir, 'pdf', assignment.pdf)
 
             # student Solution
             debug(f'opts.sourceDir = {opts.sourceDir}')
-            nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, "src")))
+            nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, 'src')))
+            debug(f'nestedDir for {assignment.id} = {nestedSourceDir}')
+            debug(f'Contents of dourceDir: {ls(opts.sourceDir)}')
+
             if assignment.src is None:
                 configError(f'No source file defined for assignment {assignment.id}')
             student_pfad = pjoin(nestedSourceDir, assignment.src)
+            debug(f'studentPfad = {student_pfad}')
 
-            # Config for API
+            #api 
             api = parseConfig(pjoin(opts.configApi, 'config.yaml'))
 
             # Result von Sprachmodell

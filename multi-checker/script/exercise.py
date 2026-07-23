@@ -80,6 +80,8 @@ class Assignment:
         testFilter = v.get('test-filter')
         extras = asList(v.get('extras', []))
         points = v.getInt('points', -1)
+        pdf = v.getStr('pdf')
+        sampleSolution = v.getStr('sampleSolution')
         try:
             points = int(points)
         except ValueError:
@@ -87,7 +89,7 @@ class Assignment:
         testOkRequired = v.getBool('test-ok-required', False)
         testScript = v.get('test-script')
         py = PythonAssignmentConfig.parse(v)
-        return Assignment(sheet, id, points, src, tests, testFilter, testOkRequired, testScript, py, extras)
+        return Assignment(sheet, id, points, src, tests, testFilter, testOkRequired, testScript, py, extras, pdf, sampleSolution)
 
 assignmentIdRe = re.compile(r'\d+[a-z]?')
 
