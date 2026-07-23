@@ -61,8 +61,8 @@ def parseArgs():
     (known, other) = parser.parse_known_args()
     if '--debug' in other:
         known.debug = True
-    if other:
-       print(f'WARNING: ignoring unknown commandline arguments: {other}')
+    # if other:
+    #    print(f'WARNING: ignoring unknown commandline arguments: {other}')
     return known
 
 # "Labortest 2, Gruppe A" -> ["labortest_2", labortest_2_gruppe_a"]
@@ -143,8 +143,6 @@ def main():
             wypp = '/wypp'
         sheet = args.sheet
         if not sheet:
-            if testDir is None:
-                raise ValueError("testDir is required")
             sheet = getSheetFromEnv(testDir)
         assignments = getAssignments(args.assignment)
         opts = python.PythonOptions(submissionDir, testDir, resultFile, sheet, assignments, wypp)
@@ -153,8 +151,6 @@ def main():
     elif cmd == 'haskell':
         sheet = args.sheet
         if not sheet:
-            if testDir is None:
-                raise ValueError("testDir is required")
             sheet = getSheetFromEnv(testDir)
         opts = haskell.HaskellOptions(submissionDir, testDir, resultFile, sheet)
         debug(f'Running haskell checks, options: {opts}')
@@ -162,8 +158,6 @@ def main():
     elif cmd == 'java':
         sheet = args.sheet
         if not sheet:
-            if testDir is None:
-                raise ValueError("testDir is required")
             sheet = getSheetFromEnv(testDir)
         offline = not args.gradle_online
         assignments = getAssignments(args.assignment)

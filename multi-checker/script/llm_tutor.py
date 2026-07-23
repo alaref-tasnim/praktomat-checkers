@@ -15,8 +15,8 @@ def configError(s) -> NoReturn:
 @dataclass
 class LlmTutorOptions(Options):
     llm_tutor_dir: str
-    solution_dir: str
-    pdf_dir: str
+    solution_dir: Optional[str]
+    pdf_dir: Optional[str]
     fakeLlm: bool
     configApi: str
     sheet: Optional[str]
@@ -68,22 +68,30 @@ def check(opts: LlmTutorOptions):
             # pfad zu Musterlösung (mount a dir > tests/llm-tutor/sampleSolution > solution)
             if assignemnt.sampleSolution is None:
                 configError(f'No test file defined for assignment {assignemnt.id}')
-
-            exSampleSolution_pfad = pjoin(getSolutionDir(opts.solution_dir), assignemnt.sampleSolution)
+            if opts.solution_dir:
+                exSampleSolution_pfad = pjoin(opts.solution_dir, assignemnt.sampleSolution)
+            else:
+                exSampleSolution_pfad = pjoin(exTest_dir, 'solution', assignemnt.sampleSolution)
 
 
             # aufgabe pfad extrahieren
             if assignemnt.pdf is None:
                 configError(f'No extra file defined for assignment {assignemnt.id}')
-            pdf = pjoin(getPdfDir(opts.pdf_dir), assignemnt.pdf)
+            if opts.pdf_dir:
+                pdf = pjoin(opts.pdf_dir, assignemnt.pdf)
+            else:
+                pdf = pjoin(exTest_dir, 'pdf', assignemnt.pdf)
 
             # student Solution
             debug(f'opts.sourceDir = {opts.sourceDir}')
-            nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, "src")))
+            nestedSourceDir = findSolutionDir(opts.sourceDir, lambda x: isDir(pjoin(x, 'src')))
+            debug(f'nestedDir for {assignemnt.id} = {nestedSourceDir}')
+            debug(f'Contents of dourceDir: {ls(opts.sourceDir)}')
 
             if assignemnt.src is None:
                 configError(f'No source file defined for assignment {assignemnt.id}')
             student_pfad = pjoin(nestedSourceDir, assignemnt.src)
+            debug(f'studentPfad = {student_pfad}')
 
             #api 
             api = parseConfig(pjoin(opts.configApi, 'config.yaml'))
